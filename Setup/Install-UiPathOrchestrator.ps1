@@ -337,8 +337,8 @@ function Main {
 
      #set storage path
     if ($nuGetStoragePath) {
-        $LBkey = @("NuGet.Packages.Path", "NuGet.Activities.Path" )
-        $LBvalue = @("\\$($nuGetStoragePath)", "\\$($nuGetStoragePath)\Activities")
+        $LBkey = @("NuGet.Packages.Path", "NuGet.Activities.Path", "Storage.Location" )
+        $LBvalue = @("\\$($nuGetStoragePath)", "\\$($nuGetStoragePath)\Activities","RootPath=\\$($nuGetStoragePath)")
         for ($i = 0; $i -lt $LBkey.count; $i++) {
             Set-AppSettings -path "$orchestratorFolder" -key $LBkey[$i] -value $LBvalue[$i]
                     }
