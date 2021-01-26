@@ -8,7 +8,7 @@
     .PARAMETER orchestratorVersion
 
       String. Allowed versions: FTS 20.4.1 and FTS 19.10.5 Version of the Orchestrator which will be installed. Example: $orchestratorVersion = "19.4.3"
-     
+
     .PARAMETER orchestratorFolder
       String. Path where Orchestrator will be installed. Example: $orchestratorFolder = "C:\Program Files\UiPath\Orchestrator"
 
@@ -63,7 +63,7 @@ param(
     [string] $orchestratorVersion = "19.10.19",
 
     [Parameter()]
-    [string] $orchestratorFolder = "${env:ProgramFiles(x86)}\UiPath\Orchestrator",
+    [string] $orchestratorFolder = "C:\Orchestrator",
 
     [Parameter(Mandatory = $true)]
     [string]  $passphrase,
@@ -204,10 +204,10 @@ function Main {
         'IIS-ManagementScriptingTools',
         'ClientForNFS-Infrastructure'
     )
-   
+
 
     try {
-    
+
       Install-UiPathOrchestratorFeatures -features $features
 
     }
@@ -242,11 +242,11 @@ function Main {
     if ($orchestratorVersion.StartsWith("2")) {
 
         $msiFeatures += @("IdentityFeature")
-        
+
         try {
-          
+
           Install-DotNetHostingBundle -DotNetHostingBundlePath "$tempDirectory\dotnet-hosting-3.1.3-win.exe"
-          
+
         }
         catch {
           Write-Error $_.exception.message
@@ -260,8 +260,8 @@ function Main {
         "ORCHESTRATORFOLDER"          = "`"$($orchestratorFolder)`"";
         "DB_SERVER_NAME"              = "$($databaseServerName)";
         "DB_DATABASE_NAME"            = "$($databaseName)";
-		    "HOSTADMIN_PASSWORD"          = "$($orchestratorAdminPassword)";
-        "DEFAULTTENANTADMIN_PASSWORD" = "$($orchestratorAdminPassword)";										
+    	"HOSTADMIN_PASSWORD"          = "$($orchestratorAdminPassword)";
+        "DEFAULTTENANTADMIN_PASSWORD" = "$($orchestratorAdminPassword)";
         "APP_ENCRYPTION_KEY"          = "$($getEncryptionKey.encryptionKey)";
         "APP_NUGET_ACTIVITIES_KEY"    = "$($getEncryptionKey.nugetKey)";
         "APP_NUGET_PACKAGES_KEY"      = "$($getEncryptionKey.nugetKey)";
@@ -337,26 +337,11 @@ function Main {
 
      #set storage path
     if ($nuGetStoragePath) {
-
-        if ($orchestratorVersion -lt "19.4.1") {
-
-            $LBkey = @("NuGet.Packages.Path", "NuGet.Activities.Path" )
-
-            $LBvalue = @("\\$($nuGetStoragePath)", "\\$($nuGetStoragePath)\Activities")
-
-            for ($i = 0; $i -lt $LBkey.count; $i++) {
-
-                Set-AppSettings -path "$orchestratorFolder" -key $LBkey[$i] -value $LBvalue[$i]
-
-            }
-
-        }
-        else {
-            $LBkey = "Storage.Location"
-            $LBvalue = "RootPath=\\$($nuGetStoragePath)"
-            Set-AppSettings -path "$orchestratorFolder" -key $LBkey -value $LBvalue
-        }
-
+        $LBkey = @("NuGet.Packages.Path", "NuGet.Activities.Path" )
+        $LBvalue = @("\\$($nuGetStoragePath)", "\\$($nuGetStoragePath)\Activities")
+        for ($i = 0; $i -lt $LBkey.count; $i++) {
+            Set-AppSettings -path "$orchestratorFolder" -key $LBkey[$i] -value $LBvalue[$i]
+                    }
     }
 
     # Remove temp directory
